@@ -1,5 +1,10 @@
 import tiktoken
 import torch
+from pathlib import Path
+
+# from main import new_config
+# from dataset import new_config
+from model import new_config
 
 tokenizer = tiktoken.get_encoding("gpt2")
 
@@ -58,3 +63,17 @@ def calc_loader_loss(data_loader, model, device, batch_size=None):
             break
     
     return total_loss / batch_size
+
+def get_model_weights_file(new_config, epoch: str):
+    weight_folder = new_config["weight_folder"]
+    weight_basename = new_config["weight_basename"]
+    weight_filename = f"{weight_basename}{epoch}.pt"
+    return str(Path(".")/weight_folder/weight_filename)
+
+def evaluate_model(train_loader, val_loader, model, device):
+    model.eval()
+    with torch.no_grad():
+        train_loss = calc_loader_loss(data_loader=train_loader, model=model, device=device)
+        val_loss = calc_loader_loss(data_loader=val_loader, model=model, device=device)
+    model.train()
+    return train_loss, val_loss

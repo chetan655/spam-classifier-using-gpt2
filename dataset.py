@@ -6,10 +6,23 @@ from pathlib import Path
 import pandas as pd
 import torch
 from torch.utils.data import Dataset, DataLoader
+import tiktoken
 
-from utils import tokenizer
-from config import cfg
-from main import new_config
+# from utils import tokenizer
+# from config import cfg
+# from main import new_config
+
+from model import new_config
+# from pre_trained_weights_load import load
+# from gpt_download3 import download_and_load_gpt2
+# from config import cfg
+
+# Model = Model
+
+
+# gpt, new_config = load(cfg=cfg, Model=Model)
+
+tokenizer = tiktoken.get_encoding("gpt2")
 
 url = "https://archive.ics.uci.edu/static/public/228/sms+spam+collection.zip"
 zip_path = "sms_spam_collection.zip"
@@ -46,7 +59,7 @@ def create_balanced_dataset(df):
     return balanced_df
 
 balanced_df = create_balanced_dataset(df)
-print(f"dataset balanced.{balanced_df["Label"].value_counts()}")
+print(f"dataset balanced.{balanced_df['Label'].value_counts()}")
 
 balanced_df["Label"] = balanced_df["Label"].map({"ham": 0, "spam": 1})
 
@@ -122,7 +135,7 @@ val_dataset = Dataset(file="val.csv", tokenizer=tokenizer, max_length=1024)
 test_dataset = Dataset(file="test.csv", tokenizer=tokenizer, max_length=1024)
 
 assert (train_dataset.max_length <= new_config["context_length"]), (
-    f"dataset max_length {train_dataset.max_length} exceeded model context_length {new_config["context_length"]}"
+    f"dataset max_length {train_dataset.max_length} exceeded model context_length {new_config['context_length']}"
 )
 
 train_loader = DataLoader(
@@ -133,7 +146,7 @@ train_loader = DataLoader(
     drop_last=True
 )
 
-val_dataloader = DataLoader(
+val_loader = DataLoader(
     dataset=val_dataset,
     batch_size=new_config["batch_size"],
     shuffle=False,

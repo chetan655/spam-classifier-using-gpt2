@@ -2,7 +2,10 @@ import torch
 import torch.nn as nn
 import math
 
-from main import new_config
+# from main import new_config
+# from dataset import new_config
+from pre_trained_weights_load import load
+from config import cfg
 
 
 class LayerNorm(nn.Module):
@@ -121,7 +124,7 @@ class Model(nn.Module):
 
         self.norm = LayerNorm(cfg)
         # self.proj_out = nn.Linear(cfg["emb_dim"], cfg["vocab_size"], bias=False)
-        self.proj_out = nn.Linear(in_features=new_config["emb_dim"], out_features=new_config["num_classes"])
+        self.proj_out = nn.Linear(in_features=cfg["emb_dim"], out_features=cfg["num_classes"])
 
         # weight init
         self.apply(self._init_weights)  
@@ -150,3 +153,5 @@ class Model(nn.Module):
         logits = self.proj_out(x)
 
         return logits
+    
+gpt, new_config = load(cfg=cfg, Model=Model)
